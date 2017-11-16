@@ -87,7 +87,7 @@ Forbruk(km) = \int_{0}^{200} forbruk(hastighet) \ dkm
 \\  
 = \underline{ (0.0714v^{2} - 3.523v + 239.203) \times 200 \times (0.6214 mile/km)}
 $$
-**Python**
+**Python funksjoner**
 
 ```python
 def consumption_wh(kph):
@@ -98,10 +98,10 @@ def total_consumption_kwh(kph, km):
 	return consumption(kph) * km / 10**3
 ```
 
-**Output**
+**Utskrift**
 
 ```
-Kjører 200km i ulike hastigheter:
+Kjører 200km i ulike hastigheter v=[40,100]:
 ------------------------------------------------
   km/h    kWh       timer      SOC %
 ------------------------------------------------
@@ -124,7 +124,7 @@ Kjører 200km i ulike hastigheter:
 
 #### OPPGAVE B)
 
-Vi har nå fått oversikt over forbruket i ulike hastigheter over 200km.
+Vi har nå fått oversikt over forbruket i ulike hastigheter over 200km. Spørsmålet er nå, hvilken hastighet er den optimale? Høyere hastighet får deg raskere frem, men fører også til lengre ladetid før du kan fortsette.
 
  
 
