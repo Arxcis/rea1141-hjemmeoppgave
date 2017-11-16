@@ -42,25 +42,27 @@ if __name__ == "__main__":
 
 	START_KWH = 100
 	KILOMETER = 200
+	LADESTOPP = 90
 
 	print("Kjører "+str(KILOMETER)+"km i ulike hastigheter:")
 	print("---------------------------------------------------------------------------------------")
-	print("    km/h   kwh/km     kWh   Kjøretid[min]   SOC start    Lade 90%[min]    Total tid    ")
+	print("    km/h   kwh/km     kWh   Kjøretid[min]   Ladestart[%]   Lade "+str(LADESTOPP)+"%[min]    Total tid    ")
 	print("---------------------------------------------------------------------------------------")
 
-	for kph in range(40,181,10):
+	for kph in range(40,180,10):
 
 		_consumption_kwh 			= consumption_kwh(kph)
 		_consumption_kwh_integrated = consumption_kwh_integrated(kph, KILOMETER)
 		_travel_time 				= travel_time(kph,KILOMETER)*60
 		_SOC_charge_begin 			= SOC(START_KWH, _consumption_kwh_integrated)
-		_charge_time 				= charge_time(100, _SOC_charge_begin)
+		_charge_time 				= charge_time(LADESTOPP, _SOC_charge_begin)
+		#_charge_time 				= 61.912 - charge_time_from_zero(_SOC_charge_begin)
 		_total_time 				= _travel_time + _charge_time
 
 		print('\t{:3d}'.format(kph),
 			  '\t{:4.3f}'.format(_consumption_kwh),
-			  '\t{:6.2f}'.format(_consumption_kwh_integrated), 
-			  '\t{:7d}'.format(round(_travel_time)),
+			  '\t{:6.2f}'.format(_consumption_kwh_integrated),
+'\t{:7d}'.format(round(_travel_time)),
 			  '\t{:10.2f}'.format(_SOC_charge_begin),
-			  '\t{:9d}'.format(round(_charge_time)),
-			  '\t{:15d}'.format(round(_total_time)))
+			  '\t{:11d}'.format(round(_charge_time)),
+			  '\t{:13d}'.format(round(_total_time)))

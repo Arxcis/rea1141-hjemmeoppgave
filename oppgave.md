@@ -21,9 +21,9 @@ Du må selv definere et problem og løse dette.  Ikke fortvil, vi stiller ikke s
 
 ### Egen oppgavetekst
 
-Jeg har kjøpt meg elbil, og skal på min første 'roadtrip'. Jeg har bestemt meg for å kjøre fra *Lindesnes* til *Nordkapp*. 
+Jeg har kjøpt meg elbil, og skal på min første 'roadtrip'. Jeg har bestemt meg for å kjøre fra *Lindesnes* til *Nordkapp*. Hva er optimal hastighet? Om jeg kjører fort, kommer jeg fortere frem, men må bruke lengre tid på å lade.
 
-**Datainnsamling**
+**Datainnsamlingi**
 
 1. **Distanse**
    Raskeste veg går igjennom sverige, 2364km[^1], i følge google maps.  Jeg ønsker heller å kjøre en litt 		lengre veg igjennom Norge, 2533km.[^2] 
@@ -70,7 +70,7 @@ $$
    ​	**Formel**
 
 $$
-Tid(StateOfCharge) = t(soc) = 0.00289soc^{2} + 0.4034soc + 2.197 \ (t_{min}), \\ soc=[0,91]
+Ladetid(StateOfCharge) = 0.00289soc^{2} + 0.4034soc + 2.197 \ (t_{min}), \\ soc=[0,91]
 $$
 
 #### OPPGAVE A)
@@ -79,54 +79,92 @@ Jeg starter med fulladet bil. Første etappe til min første ladestopp er 200Km.
 
 Vi har allerede "forbrukshastighet" fra dataene. Da er det bare å lage et bestemt integral for å få totalforbruket. Vi integrerer med hensyn på kilometer:
 $$
-Forbruk(km) = \int_{0}^{200} forbruk(hastighet) \ dkm
+TotaltForbruk(km, v) = \int_{start_{km}}^{slutt_{km}} forbruk(v) \ dkm
 \\
-= \int_{0}^{200} (0.0714v^{2} - 3.523v + 239.203)  \ dkm 
+TotaltForbruk(v)  = \int_{0}^{200} (0.0714v^{2} - 3.523v + 239.203)  \ dkm 
 \\
 = \bigg(  (0.0714v^{2} - 3.523v + 239.203) \ km \bigg)_0^{200}
 \\  
 = \underline{ (0.0714v^{2} - 3.523v + 239.203) \times 200 \times (0.6214 mile/km)}
 $$
-**Python funksjoner**
-
-```python
-def consumption_wh(kph):
-	mph = kph / KM_TO_MILE
-	return (0.0714*mph**2 - 3.523*mph + 239.203) * MILE_TO_KM
-
-def total_consumption_kwh(kph, km):
-	return consumption(kph) * km / 10**3
-```
+Vi antar at forbruket er konstant for en gitt hastighet men, i en bil med fossilt drivstoff, så vil forbruket også være en funksjon av kilometer, fordi etterhvert som en bruker opp drivstoffet, så blir bilen lettere og forbruket går dermed ned. I en elektrisk bil trenger vi ikke å ta hensynet til dette, siden drivstoffet er elektroner som har negliserbar vekt. Forbruket varierer også som en funksjon av vindretning, vindhastighet, høydemeter både opp og ned.
 
 **Utskrift**
 
 ```
-Kjører 200km i ulike hastigheter v=[40,100]:
-------------------------------------------------
-  km/h    kWh       timer      SOC %
-------------------------------------------------
-    40 	  24.33 	 5.00 	   75.67
-    45 	  24.42 	 4.44 	   75.58
-    50 	  24.69 	 4.00 	   75.31
-    55 	  25.13 	 3.64 	   74.87
-    60 	  25.74 	 3.33 	   74.26
-    65 	  26.52 	 3.08 	   73.48
-    70 	  27.47 	 2.86 	   72.53
-    75 	  28.60 	 2.67 	   71.40
-    80 	  29.90 	 2.50 	   70.10
-    85 	  31.36 	 2.35 	   68.64
-    90 	  33.00 	 2.22 	   67.00
-    95 	  34.81 	 2.11 	   65.19
-   100 	  36.79 	 2.00 	   63.21
+Kjører 200km i ulike hastigheter:
+--------------------------------
+    km/h   kwh/km     kWh
+---------------------------------
+	 40 	0.122 	 24.33
+	 50 	0.123 	 24.69
+	 60 	0.129 	 25.74
+	 70 	0.137 	 27.47
+	 80 	0.149 	 29.90
+	 90 	0.165 	 33.00
+	100 	0.184 	 36.79
+	110 	0.206 	 41.27
+	120 	0.232 	 46.43
+	130 	0.261 	 52.28
+	140 	0.294 	 58.81
+	150 	0.330 	 66.03
+	160 	0.370 	 73.94
+	170 	0.413 	 82.53
 ```
 
 
 
 #### OPPGAVE B)
 
-Vi har nå fått oversikt over forbruket i ulike hastigheter over 200km. Spørsmålet er nå, hvilken hastighet er den optimale? Høyere hastighet får deg raskere frem, men fører også til lengre ladetid før du kan fortsette.
+Jeg starter med 100% (100kWh) kapasitet på batteriet. Hva er "State of Charge"(SOC) i % når jeg kommer frem til første lader etter 200km?
+$$
+LadestartSOC(v) = startkWh - TotalForbruk(v)
+\\
+= \underline{100kWh - (0.0714v^{2} - 3.523v + 239.203) \times 200 \times (0.6214 mile/km))}
+$$
+Jeg velger å kjøre i 90 km/t. Etter 200km har eg 67 kWh igjen på batteriet.
 
- 
+
+**OPPGAVE C)**
+
+Hvor lang tid tar det for meg å lade opp til  90% som en funksjon av hastighet *v*, før jeg kan kjøre videre? Gitt at jeg started med 100% kapasitet?
+$$
+Ladetid(v) = \int_{Start_{SOC}(v)}^{Slutt_{SOC}} Ladetid \ '(soc) \ dsoc
+\\
+= \bigg(Ladetid(soc) \bigg)_{Start_{SOC}(v)}^{Slutt_{SOC}}
+\\
+=Ladetid(Slutt_{SOC}) - Start_{SOC}(v)
+\\
+=Ladetid(Slutt_{SOC}) - (startkWh - TotalForbruk(v))
+\\
+=Ladetid(Slutt_{SOC}) - (startkWh - \int_{start_{km}}^{slutt_{km}} forbruk(v) \ dkm
+\\
+=Ladetid(Slutt_{SOC}) - (startkWh - (forbruk(v)\times slutt_{km} - forbruk(v) \times start_{km})
+$$
+Gitt at:
+
+- SluttSOC = 90%
+
+- startkWh = 100kWh(100%)
+
+- sluttkm = 200km
+
+- startkm = 0km
+
+$$
+Ladetid(v) = ( 0.00289\times 90^{2} + 0.4034\times 90 + 2.197 ) - (100  (0.0714v^{2} - 3.523v + 239.203) \times 200 \times (0.6214))
+\\
+Ladetid(v) = -38.088 +  TotalForbruk(v)
+$$
+  
+
+### OPPGAVE C)
+
+  ​
+
+  ​
+
+  ​
 
 [^1]: Sweedish-route ,  https://goo.gl/maps/JYmrfFJHUJ42 - 15.11.17
 [^2]: Norwegian-route, https://goo.gl/maps/ukhx6uGBVx82 - 15.11.17
