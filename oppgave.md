@@ -55,7 +55,7 @@ $$
 
    ​	**Formel**
    $$
-   forbruk(hastighet) = f(v) = 0.0714v^{2} - 3.523v + 239.203 \ (Wh/mile)  \ \ \\  (0.6214mile/km)
+   forbruk(hastighet) = f(v) = 0.0714v^{2} - 3.523v + 239.203 \ (Wh/mile), \\ v=[5,70] 
    $$
    ​
 
@@ -70,16 +70,18 @@ $$
    ​	**Formel**
 
 $$
-Tid(StateOfCharge) = t(soc) = 0.00289soc^{2} + 0.4034soc + 2.197 \ (t_{min})
+Tid(StateOfCharge) = t(soc) = 0.00289soc^{2} + 0.4034soc + 2.197 \ (t_{min}), \\ soc=[0,91]
 $$
 
-**Oppgave a)**
+#### OPPGAVE A)
 
 Jeg starter med fulladet bil. Første etappe til min første ladestopp er 200Km. Hvor mye energi i kWh bruker bilen på den første etappen?
 
 Vi har allerede "forbrukshastighet" fra dataene. Da er det bare å lage et bestemt integral for å få totalforbruket. Vi integrerer med hensyn på kilometer:
 $$
-Forbruk(km) = \int_{0}^{200} (0.0714v^{2} - 3.523v + 239.203)  \ dkm 
+Forbruk(km) = \int_{0}^{200} forbruk(hastighet) \ dkm
+\\
+= \int_{0}^{200} (0.0714v^{2} - 3.523v + 239.203)  \ dkm 
 \\
 = \bigg(  (0.0714v^{2} - 3.523v + 239.203) \ km \bigg)_0^{200}
 \\  
@@ -88,33 +90,41 @@ $$
 **Python**
 
 ```python
-def total_consumption(speed, kilometer):
-	return (0.0714*speed**2 - 3.523*speed + 239.203) * kilometer * mileTokm / 10**3
+def consumption_wh(kph):
+	mph = kph / KM_TO_MILE
+	return (0.0714*mph**2 - 3.523*mph + 239.203) * MILE_TO_KM
+
+def total_consumption_kwh(kph, km):
+	return consumption(kph) * km / 10**3
 ```
 
 **Output**
 
 ```
-Forskjellige hastigheter kjører i 200km:
-  5 km/h	 27.76 kWh
- 10 km/h	 26.24 kWh
- 15 km/h	 25.16 kWh
- 20 km/h	 24.52 kWh
- 25 km/h	 24.33 kWh
- 30 km/h	 24.58 kWh
- 35 km/h	 25.27 kWh
- 40 km/h	 26.41 kWh
- 45 km/h	 27.99 kWh
- 50 km/h	 30.02 kWh
- 55 km/h	 32.49 kWh
- 60 km/h	 35.40 kWh
- 65 km/h	 38.76 kWh
- 70 km/h	 42.56 kWh
+Kjører 200km i ulike hastigheter:
+------------------------------------------------
+  km/h    kWh       timer      SOC %
+------------------------------------------------
+    40 	  24.33 	 5.00 	   75.67
+    45 	  24.42 	 4.44 	   75.58
+    50 	  24.69 	 4.00 	   75.31
+    55 	  25.13 	 3.64 	   74.87
+    60 	  25.74 	 3.33 	   74.26
+    65 	  26.52 	 3.08 	   73.48
+    70 	  27.47 	 2.86 	   72.53
+    75 	  28.60 	 2.67 	   71.40
+    80 	  29.90 	 2.50 	   70.10
+    85 	  31.36 	 2.35 	   68.64
+    90 	  33.00 	 2.22 	   67.00
+    95 	  34.81 	 2.11 	   65.19
+   100 	  36.79 	 2.00 	   63.21
 ```
 
 
 
+#### OPPGAVE B)
 
+Vi har nå fått oversikt over forbruket i ulike hastigheter over 200km.
 
  
 
