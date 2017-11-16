@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
 	print("Kjører "+str(KILOMETER)+"km i ulike hastigheter:")
 	print("---------------------------------------------------------------------------------------")
-	print("    km/h   kwh/km     kWh   Kjøretid[min]   Ladestart[%]   Lade "+str(LADESTOPP)+"%[min]    Total tid    ")
+	print("    km/h   Kjøretid[min]  + Lade "+str(LADESTOPP)+"%[min] =  Total tid    ")
 	print("---------------------------------------------------------------------------------------")
 
 	for kph in range(40,180,10):
@@ -60,9 +60,9 @@ if __name__ == "__main__":
 		_total_time 				= _travel_time + _charge_time
 
 		print('\t{:3d}'.format(kph),
-			  '\t{:4.3f}'.format(_consumption_kwh),
-			  '\t{:6.2f}'.format(_consumption_kwh_integrated),
-'\t{:7d}'.format(round(_travel_time)),
-			  '\t{:10.2f}'.format(_SOC_charge_begin),
+			  #'\t{:4.3f}'.format(_consumption_kwh),
+			  #'\t{:6.2f}'.format(_consumption_kwh_integrated),
+			  '\t{:7d}'.format(round(_travel_time)),
+			  #'\t{:10.2f}'.format(_SOC_charge_begin),
 			  '\t{:11d}'.format(round(_charge_time)),
 			  '\t{:13d}'.format(round(_total_time)))
