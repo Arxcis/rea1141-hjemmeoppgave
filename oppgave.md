@@ -11,9 +11,7 @@ fakultet: Informasjonsteknologi og Elektroteknikk
 sted: NTNU Gjøvik    
 ```
 
-
-
-### Lærers oppgavetekst
+### Oppgave
 
 Tanken med obligen er å anvende matematikk i en praktisk oppgave gjennom bruk av derivasjon, integrasjon og/eller diff.likninger.
 
@@ -25,19 +23,10 @@ Du må selv definere et problem og løse dette.  Ikke fortvil, vi stiller ikke s
 
 Jeg har kjøpt meg elbil, og skal på min første 'roadtrip'. Jeg har bestemt meg for å kjøre fra *Lindesnes* til *Nordkapp*. 
 
-**Problem**
-Min storebror mener at jeg bør holde høyest mulig hastighet, ha mange korte ladestopp. Han mener at den økte hastigheten vil tjene inn den ekstra tiden som må brukes på mer ladetid pga. økt energiforbruk.
-Jeg mener at jeg bør kjøre så effektivt(sakte) som mulig, for å komme lengst mulig på hver lading, og dermed få færrest mulig ladestopp, og stoppe lengst mulig når jeg først stopper.
-
-Hva er den idelle hastigheten? Hva er det ideelle ladeintervallet?
-
 **Datainnsamling**
 
-For å finne ut dette så må det hentes inn litt data.
-
-
-
-1. Raskeste veg går igjennom sverige, 2364km[^1], i følge google maps.  Jeg ønsker heller å kjøre en litt lengre veg igjennom Norge, 2533km.[^2] 
+1. **Distanse**
+   Raskeste veg går igjennom sverige, 2364km[^1], i følge google maps.  Jeg ønsker heller å kjøre en litt 		lengre veg igjennom Norge, 2533km.[^2] 
 
 $$
 D = 2533km
@@ -45,67 +34,99 @@ $$
 
 
 
-2. Elbilen jeg har kjøpt er en Tesla Model S AWD P100D med 100kwh batteri. [^3] Denne har et forbruk på 21 kWh/100km.[^3]
+2. **Kapasitet**
+   Elbilen jeg har kjøpt er en Tesla Model S AWD P100D med 100kwh batteri. [^3]
 
 $$
-E = 100kWh  \\
-F = 21kWh/100km
+Batterikapasitet = 100kWh  \\
 $$
 
+3. **Forbruk per hastighet** 
+
+   ![rangevsconsumption](speedvsconsumption.jpg)
+
+   *Image: Tesla.com blog - Model S efficiency and range fra 2012*[^4]
+
+   Grafen ovenfor er hentet fra Tesla sin offisielle blog, hvor det i denne posten fra 2012, diskuteres hvordan fart påvirker rekkevidden.
+
+   **WolframAlpha plot**
+
+   ![](speedvsconsumption.png)
+
+   ​	**Formel**
+   $$
+   forbruk(hastighet) = f(v) = 0.0714v^{2} - 3.523v + 239.203 \ (Wh/mile)  \ \ \\  (0.6214mile/km)
+   $$
+   ​
 
 
-3. Et gammelt bilde fra Tesla sin hjemmeside tesla.com[^4] viser ladekapasitet som en funksjon av tid
+4. **Tid per prosent lading**
 
-![](ladefart.gif)
+   Hvor lang tid tar det å lade fra 60-80 prosent sammenlik med med fra 40-60 prosent. Data for dette har jeg hentet fra en youtube-video[^6] av en Tesla-eier som har tatt tiden på hvor fort bilen sin lader fra 0-90% fulladet (0kWh - 90kWh). 
 
+   **Wolframalpha plot**
 
+   ![](socvst.png)
+   ​	**Formel**
 
-4. Bruker MyCurveFit[^5] til å numerisk generere en funksjon for ladekapasitet(t) basert verdiene fra bildet over. Outputten fra MyCurveFit:
+$$
+Tid(StateOfCharge) = t(soc) = 0.00289soc^{2} + 0.4034soc + 2.197 \ (t_{min})
+$$
+
+**Oppgave a)**
+
+Jeg starter med fulladet bil. Første etappe til min første ladestopp er 200Km. Hvor mye energi i kWh bruker bilen på den første etappen?
+
+Vi har allerede "forbrukshastighet" fra dataene. Da er det bare å lage et bestemt integral for å få totalforbruket. Vi integrerer med hensyn på kilometer:
+$$
+Forbruk(km) = \int_{0}^{200} (0.0714v^{2} - 3.523v + 239.203)  \ dkm 
+\\
+= \bigg(  (0.0714v^{2} - 3.523v + 239.203) \ km \bigg)_0^{200}
+\\  
+= \underline{ (0.0714v^{2} - 3.523v + 239.203) \times 200 \times (0.6214 mile/km)}
+$$
+**Python**
+
+```python
+def total_consumption(speed, kilometer):
+	return (0.0714*speed**2 - 3.523*speed + 239.203) * kilometer * mileTokm / 10**3
+```
+
+**Output**
 
 ```
-y = 1.421085e-14 + 2.761905x - 0.01904762x^2
+Forskjellige hastigheter kjører i 200km:
+  5 km/h	 27.76 kWh
+ 10 km/h	 26.24 kWh
+ 15 km/h	 25.16 kWh
+ 20 km/h	 24.52 kWh
+ 25 km/h	 24.33 kWh
+ 30 km/h	 24.58 kWh
+ 35 km/h	 25.27 kWh
+ 40 km/h	 26.41 kWh
+ 45 km/h	 27.99 kWh
+ 50 km/h	 30.02 kWh
+ 55 km/h	 32.49 kWh
+ 60 km/h	 35.40 kWh
+ 65 km/h	 38.76 kWh
+ 70 km/h	 42.56 kWh
 ```
 
 
 
-5. Skriver den om, og fjerner konstantleddet siden det er tilnærmet lik 0.
-
-$$
-ladekapasitet \ per \ tid = f(t) = \underline{- 0.019t^{2} + 2.762t}
-$$
-
-For å teste at det stemmer så prøver vi å sette inn *t = 75min* . Her forventer vi at *f(t) = 100kWh*.
-$$
-f(75) = -0.02*75^{2} + 2.76*75  =94.5,  \ \sigma = -5.5 \\
-f(75) = -0.019*75^{2} + 2.762*75  = 100.275,  \ \sigma=+0.275 \\
-f(75) = -0.0190*75^{2} + 2.7619*75  = 100.2675,  \ \sigma=+0.2675
-$$
-Vi ser at vi må bruke minst 3 desimaler for å få et utrykk som treffer  < 1kWh fra det vi forventet ideelt sett.
 
 
-
-6. Den deriverte av ladekapasitet gir oss ladehastighet:
-
-$$
-ladehastighet \ per \ tid = f'(t) = (-0.019t^{2}+2.762t)' = -2*0.019t^{2} + 2.762 = \underline{-0.038t^{2}+2.762}
-$$
-
-
-
-
-
+ 
 
 [^1]: Sweedish-route ,  https://goo.gl/maps/JYmrfFJHUJ42 - 15.11.17
 [^2]: Norwegian-route, https://goo.gl/maps/ukhx6uGBVx82 - 15.11.17
 [^3]: Tesla energy consumption, https://en.wikipedia.org/wiki/Tesla_Model_S#Energy_consumption - 15.11.17
-[^4]: Tesla sin hjemmeside - http://i.imgur.com/cQPkofQ.gif
-[^5]: MyCurveFit.com, https://mycurvefit.com/ - 15.11.17
+[^4]: Tesla blog model s efficiency, https://www.tesla.com/no_NO/blog/model-s-efficiency-and-range?redirect=no - 15.11.17
+[^5]: WolframAlpha.com, https://www.wolframalpha.com/ - 15.11.17
+[^6]: Supercharging P100D to 90%, Bjorn Nyland, https://youtu.be/qS3ulrEhLAg, - 15.11.17
 
 
 
 
-$$
-dinstance = d =
-$$
 
 
